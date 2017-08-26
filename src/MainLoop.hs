@@ -21,10 +21,19 @@ gameLoop gs = do
   putStr "\b"
   let newState = handleAnswer (Answer input) gs
   putStr $ printGame newState
-  gameLoop newState
+  if gameOver newState
+    then putStrLn "Good Job!" >> putStrLn (printScore newState)
+    else gameLoop newState
 
 mainGame :: IO ()
 mainGame = do
+  initialState <- characterPrompt
   hSetBuffering stdin NoBuffering
-  putStr $ printGame newGame
-  gameLoop newGame
+  putStr $ printGame initialState
+  gameLoop initialState
+
+characterPrompt :: IO GState
+characterPrompt = do
+  putStrLn "enter characters to practice:"
+  characters <- getLine
+  generateGame characters
