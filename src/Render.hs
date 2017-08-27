@@ -6,13 +6,15 @@ import qualified Data.Map as M
 
 printGame :: GState -> String
 printGame (GState (Characters cs) (Current n) a _) =
-  cs ++ "\n" ++ indicator ++ "\n" ++ previous ++ lastAnswer ++ "\n"
+  test ++ "\n" ++ indicator ++ "\n" ++ previous ++ lastAnswer ++ "\n"
   where
-    indicator = replicate n ' ' ++ "^"
-    previous = take n cs
+    test = "\x1b[32m" ++ take n cs ++ "\x1b[36;1m" ++ drop n cs ++ "\x1b[0m"
+     --    ^ to green                  ^ to bright cyan             ^ normal
+    indicator = replicate n ' ' ++ "\x1b[36;1m^\x1b[0m" -- bright cyan
+    previous = "\x1b[32m" ++ take n cs ++ "\x1b[0m" -- green
     lastAnswer = case a of
-      Just (Answer a) -> [a]
-      Nothing -> ""
+      Just (Answer a) -> "\x1b[31;1m" ++ [a] ++ "\x1b[0m"
+      Nothing -> ""       -- ^ bright red          ^ normal
 
 printScore :: GState -> String
 printScore (GState _ _ _ (Score sc)) =

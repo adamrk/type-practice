@@ -5,17 +5,6 @@ import System.IO
 import GameState
 import Render
 
-echoLoop :: IO a
-echoLoop = do
-  input <- getChar
-  putStrLn [input]
-  echoLoop
-
-unbufferedEcho :: IO a
-unbufferedEcho = do
-  hSetBuffering stdin NoBuffering
-  echoLoop
-
 gameLoop :: GState -> IO ()
 gameLoop gs = do
   input <- getChar
