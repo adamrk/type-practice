@@ -19,7 +19,7 @@ unbufferedEcho = do
 gameLoop :: GState -> IO ()
 gameLoop gs = do
   input <- getChar
-  putStr "\b"
+  putStr clearScreen
   let newState = handleAnswer (Answer input) gs
   putStr $ printGame newState
   if gameOver newState
@@ -32,6 +32,7 @@ mainGame :: IO ()
 mainGame = do
   initialState <- characterPrompt
   hSetBuffering stdin NoBuffering
+  putStr clearScreen
   putStr $ printGame initialState
   gameLoop initialState
 

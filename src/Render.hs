@@ -26,3 +26,6 @@ printScore (GState _ _ _ (Score sc)) =
 
 ratio2double :: Int -> Int -> Double
 ratio2double a b = if b == 0 then 0 else fromIntegral a / fromIntegral b
+
+clearScreen :: String
+clearScreen = "\x1b[2J\x1b[f"
