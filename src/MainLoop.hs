@@ -1,6 +1,6 @@
 module MainLoop where
 
-import System.Random (getStdGen)
+import System.Random (newStdGen)
 import System.IO
 import GameState
 import Render
@@ -23,7 +23,9 @@ gameLoop gs = do
   let newState = handleAnswer (Answer input) gs
   putStr $ printGame newState
   if gameOver newState
-    then putStrLn "\nGood Job!" >> putStrLn (printScore newState)
+    then putStrLn "\nGood Job!"
+         >> putStrLn (printScore newState)
+         >> mainGame
     else gameLoop newState
 
 mainGame :: IO ()
@@ -39,5 +41,5 @@ characterPrompt = do
   characters <- getLine
   putStrLn "enter game size:"
   size <- read <$> getLine
-  randomGen <- getStdGen
+  randomGen <- newStdGen
   return $ generateGame randomGen size characters
