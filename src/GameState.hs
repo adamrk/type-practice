@@ -1,7 +1,8 @@
 module GameState where
 
-import qualified Data.Map as M
 import Data.List (sort)
+import System.Random (RandomGen, randomRs)
+import qualified Data.Map as M
 
 newtype Characters = Characters String deriving (Eq, Show)
 
@@ -40,13 +41,15 @@ gameOver (GState (Characters cs) (Current n) _ _) = n >= length cs
 newGame :: GState
 newGame = GState (Characters "aoeu") (Current 0) Nothing (emptyScore "aoeu")
 
-generateGame :: String -> IO GState
-generateGame cs = pure $
-  GState
-  (Characters cs)
-  (Current 0)
-  Nothing
-  (emptyScore cs)
+generateGame :: RandomGen g => g -> Int -> String -> GState
+generateGame g size cs =
+  let n = length cs
+      goals = map (\i -> cs !! i) $ take size $ randomRs (0,n-1) g
+  in  GState
+      (Characters goals)
+      (Current 0)
+      Nothing
+      (emptyScore cs)
 
 uniqueChars :: String -> String
 uniqueChars = uniqueFromSort . sort

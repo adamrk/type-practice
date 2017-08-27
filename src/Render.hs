@@ -25,4 +25,4 @@ printScore (GState _ _ _ (Score sc)) =
       show b ++ "  " ++ show (100 * ratio2double a (a+b)) ++ "%\n"
 
 ratio2double :: Int -> Int -> Double
-ratio2double a b = fromIntegral a / fromIntegral b
+ratio2double a b = if b == 0 then 0 else fromIntegral a / fromIntegral b
