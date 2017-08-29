@@ -16,8 +16,8 @@ printGame (GState (Characters cs) (Current n) a _) =
       Just (Answer a) -> "\x1b[31;1m" ++ [a] ++ "\x1b[0m"
       Nothing -> ""       -- ^ bright red          ^ normal
 
-printScore :: GState -> String
-printScore (GState _ _ _ (Score sc)) =
+printScore :: Score -> String
+printScore (Score sc) =
   " cor inc per\n" ++ foldl' (\acc s -> singleScore s ++ acc) "" sortedScores
   where
     compScores (a,b) (c,d) =

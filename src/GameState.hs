@@ -1,7 +1,11 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module GameState where
 
 import Data.List (sort)
 import System.Random (RandomGen, randomRs)
+import Data.Serialize (Serialize)
+import GHC.Generics (Generic)
 import qualified Data.Map as M
 
 newtype Characters = Characters String deriving (Eq, Show)
@@ -10,8 +14,9 @@ newtype Current = Current Int deriving (Eq, Show)
 
 newtype Answer = Answer Char deriving (Eq, Show)
 
-newtype Score = Score (M.Map Char (Int, Int)) deriving (Eq, Show)
+newtype Score = Score (M.Map Char (Int, Int)) deriving (Eq, Show, Generic)
 
+instance Serialize Score
 
 data GState = GState 
               { characters :: Characters
@@ -71,3 +76,8 @@ wrong c (Score m) = Score $ M.update bump2 c m
 right :: Char -> Score -> Score
 right c (Score m) = Score $ M.update bump1 c m
   where bump1 (a,b) = Just (a+1, b)
+
+combineScores :: Score -> Score -> Score
+combineScores (Score a) (Score b) = Score $ M.unionWith addPointwise a b
+  where
+    addPointwise (a,b) (c,d) = (a+c, b+d)
