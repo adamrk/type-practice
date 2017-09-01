@@ -3,6 +3,7 @@
 module GameState where
 
 import Control.Monad.State
+import Test.QuickCheck.Arbitrary
 import Data.List (sort)
 import System.Random (RandomGen, randomRs)
 import Data.Serialize (Serialize)
@@ -27,6 +28,10 @@ data GState = GState
               } deriving (Eq, Show)
 -- invariant: current < length characters
 
+instance Arbitrary GState where
+  arbitrary = do
+    s <- arbitrary
+    return $ emptyGame s (uniqueChars s)
 
 handleAnswer :: Answer -> GState -> GState
 handleAnswer (Answer c) gs =
@@ -92,3 +97,6 @@ isPerfect (Score m) = M.foldr singlePerfect True m
   where singlePerfect _ False = False
         singlePerfect (_,0) True = True
         singlePerfect _ True = False
+
+gameInvariant :: GState -> Bool
+gameInvariant (GState (Characters cs) (Current n) _ _) = length cs > n

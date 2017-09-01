@@ -11,5 +11,11 @@ propPerfectGame s = isPerfect . score $ execState (runGame answers) game
     game = emptyGame s (uniqueChars s)
     answers = map Answer s
 
+propGameInvariant :: GState -> Bool
+propGameInvariant = gameInvariant
+
 main :: IO ()
-main = quickCheck propPerfectGame
+main = do
+  quickCheck $ label "perfect games score as expected" propPerfectGame
+  quickCheck $ label "game state invariant fails with empty test characters"
+    $ expectFailure propGameInvariant
