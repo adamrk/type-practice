@@ -17,16 +17,28 @@ printGame (GState (Characters cs) (Current n) a _) =
 
 printScore :: Score -> String
 printScore (Score sc) =
-  " cor inc per\n" ++ foldl' (\acc s -> singleScore s ++ acc) "" sortedScores
+  "   cor  inc  per\n" ++
+  foldl' (\acc s -> singleScore s ++ acc) "" sortedScores
   where
     compScores (a,b) (c,d) =
       compare (ratio2double c (c+d)) (ratio2double a (a+b))
     sortedScores = sortBy (\x y -> compScores (snd x) (snd y)) $ M.toList sc
-    singleScore (k, (a,b)) = [k] ++ "  " ++ show a ++ "  " ++
-      show b ++ "  " ++ show (100 * ratio2double a (a+b)) ++ "%\n"
+    singleScore (k, (a,b)) =
+      [k] ++ padString countPad (show a) ++ padString countPad (show b) ++
+      padString perPad (show . floor $ 100 * ratio2double a (a+b)) ++ "%\n"
 
 ratio2double :: Int -> Int -> Double
 ratio2double a b = if b == 0 then 0 else fromIntegral a / fromIntegral b
+
+padString :: Int -> String -> String
+padString n s = if diff >= 0 then replicate diff ' ' ++ s else s
+  where diff = n - length s
+
+countPad :: Int
+countPad = 5
+
+perPad :: Int
+perPad = 4
 
 clearScreen :: String
 clearScreen = "\x1b[2J\x1b[f"
