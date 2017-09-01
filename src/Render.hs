@@ -8,13 +8,12 @@ printGame :: GState -> String
 printGame (GState (Characters cs) (Current n) a _) =
   test ++ "\n" ++ indicator ++ "\n" ++ previous ++ lastAnswer ++ "\n"
   where
-    test = "\x1b[32m" ++ take n cs ++ "\x1b[36;1m" ++ drop n cs ++ "\x1b[0m"
-     --    ^ to green                  ^ to bright cyan             ^ normal
-    indicator = replicate n ' ' ++ "\x1b[36;1m^\x1b[0m" -- bright cyan
-    previous = "\x1b[32m" ++ take n cs ++ "\x1b[0m" -- green
+    test = toGreen ++ take n cs ++ toCyan ++ drop n cs ++ toNormal
+    indicator = replicate n ' ' ++ toCyan ++ toNormal
+    previous = toGreen ++ take n cs ++ toNormal
     lastAnswer = case a of
-      Just (Answer a) -> "\x1b[31;1m" ++ [a] ++ "\x1b[0m"
-      Nothing -> ""       -- ^ bright red          ^ normal
+      Just (Answer a) -> toRed ++ [a] ++ toNormal
+      Nothing -> ""
 
 printScore :: Score -> String
 printScore (Score sc) =
@@ -31,3 +30,15 @@ ratio2double a b = if b == 0 then 0 else fromIntegral a / fromIntegral b
 
 clearScreen :: String
 clearScreen = "\x1b[2J\x1b[f"
+
+toGreen :: String
+toGreen = "\x1b[32m"
+
+toNormal :: String
+toNormal = "\x1b[0m"
+
+toCyan :: String
+toCyan = "\x1b[36;1m" -- bright cyan
+
+toRed :: String
+toRed = "\x1b[31;1m" -- bright red
