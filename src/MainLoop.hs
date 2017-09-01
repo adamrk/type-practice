@@ -31,7 +31,7 @@ mainGame = do
     Right sc -> putStrLn "Saved Scores:" >> (putStrLn $ printScore sc)
     Left _ -> return ()
   initialState <- characterPrompt
-  hSetBuffering stdin NoBuffering
+  hSetBuffering stdin NoBuffering -- no buffer so you can't erase mistakes
   putStr clearScreen
   putStr $ printGame initialState
   newScore <- gameLoop initialState
@@ -41,6 +41,7 @@ mainGame = do
   case savedFile of
     Just f -> BS.writeFile f (encode newOverallScore)
     Nothing -> return ()
+  hSetBuffering stdin LineBuffering -- back to line buffer for prompt
   mainGame
 
 characterPrompt :: IO GState
