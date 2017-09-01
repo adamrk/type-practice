@@ -2,6 +2,7 @@
 
 module GameState where
 
+import Control.Monad.State
 import Data.List (sort)
 import System.Random (RandomGen, randomRs)
 import Data.Serialize (Serialize)
@@ -40,6 +41,9 @@ handleAnswer (Answer c) gs =
     sc = score gs
     goal = chrs !! curr
 
+handleAnswerState :: Answer -> State GState ()
+handleAnswerState a = state $ \g -> ((), handleAnswer a g)
+
 gameOver :: GState -> Bool
 gameOver (GState (Characters cs) (Current n) _ _) = n >= length cs
 
@@ -48,13 +52,10 @@ newGame = GState (Characters "aoeu") (Current 0) Nothing (emptyScore "aoeu")
 
 generateGame :: RandomGen g => g -> Int -> String -> GState
 generateGame g size cs =
-  let n = length cs
+  let uniquecs = uniqueChars cs
+      n = length uniquecs
       goals = map (\i -> cs !! i) $ take size $ randomRs (0,n-1) g
-  in  GState
-      (Characters goals)
-      (Current 0)
-      Nothing
-      (emptyScore cs)
+  in  emptyGame goals uniquecs
 
 uniqueChars :: String -> String
 uniqueChars = uniqueFromSort . sort
@@ -69,6 +70,10 @@ emptyScore :: String -> Score
 emptyScore cs =
   Score $ M.fromList $ zip (uniqueChars cs) (repeat (0,0))
 
+emptyGame :: String -> String -> GState
+emptyGame goals cs =
+  GState (Characters goals) (Current 0) Nothing (emptyScore cs)
+
 wrong :: Char -> Score -> Score
 wrong c (Score m) = Score $ M.update bump2 c m
   where bump2 (a,b) = Just (a, b+1)
@@ -81,3 +86,9 @@ combineScores :: Score -> Score -> Score
 combineScores (Score a) (Score b) = Score $ M.unionWith addPointwise a b
   where
     addPointwise (a,b) (c,d) = (a+c, b+d)
+
+isPerfect :: Score -> Bool
+isPerfect (Score m) = M.foldr singlePerfect True m
+  where singlePerfect _ False = False
+        singlePerfect (_,0) True = True
+        singlePerfect _ True = False
